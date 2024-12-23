@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT-2 Naked</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #chat-container {
+            width: 90%;
+            max-width: 600px;
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 400px;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .message {
+            margin: 5px 0;
+        }
+        .user {
+            text-align: right;
+            color: #007bff;
+        }
+        .bot {
+            text-align: left;
+            color: #555;
+        }
+        #input-container {
+            display: flex;
+            gap: 10px;
+        }
+        #prompt {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #send-button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <div id="input-container">
+            <input type="text" id="prompt" placeholder="Type your message..." />
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const messagesDiv = document.getElementById("messages");
+        const promptInput = document.getElementById("prompt");
+        const sendButton = document.getElementById("send-button");
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", sender);
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+
+            // Adiciona a mensagem do usuário ao chat
+            addMessage(prompt, "user");
+            promptInput.value = "";
+
+            try {
+                // Envia o prompt para a API
+                const response = await fetch("http://127.0.0.1:5000/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ prompt }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage(data.response, "bot");
+                } else {
+                    addMessage("Erro ao obter resposta do chatbot.", "bot");
+                }
+            } catch (error) {
+                addMessage("Erro ao se conectar com a API.", "bot");
+            }
+        }
+
+        sendButton.addEventListener("click", sendMessage);
+
+        promptInput.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
