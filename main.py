@@ -14,7 +14,7 @@ if tokenizer.pad_token is None:
 def home():
     return render_template("index.html")
 
-@app.route("/gpt2naked/api/v1/chat", methods=["POST"])
+@app.route("/puregpt2/api/v1/chat", methods=["POST"])
 def chat():
     try:
         data = request.get_json()
