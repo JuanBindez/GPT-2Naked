@@ -19,7 +19,6 @@ def chat():
     try:
         data = request.get_json()
         prompt = data.get("prompt", "")
-        context = data.get("context", "")
 
         inputs = tokenizer(prompt, return_tensors="pt", padding=True)
         output = model.generate(
